@@ -42,9 +42,19 @@ Explain what each test does and why
 
 ```
 1.androidTest
-        //TODO: Students explain their testing here.
+        // DONE: Students explain their testing here.
+        a. Added EspressoIdlingResource to the utils directory to handle idling resources
+        b. RemindersDaoTest to test the RemindersDao interface (insertRemindersAndGetAll - insertRemindersAndDeleteAll - insertRemindersAndDeleteReminderById)
+        c. RemindersLocalRepositoryTest to test the RemindersLocalRepository class (saveReminder_retrievesReminderById - saveReminders_retrievesAllReminders - saveReminders_deletesOneReminderById - saveReminders_deletesAllReminders)
+        d. ReminderListFragmentTest to test the ReminderListFragment (reminderList_DisplayedInUi - reminderList_noReminders - clickFab_navigateToReminderFragment)
+        e. RemindersActivityTest to do an end-to-end test (showReminderSavedToast - showSnackbar_enterTitle - showSnackbar_enterLocation)
+
 2. test
-        //TODO: Students explain their testing here.
+        // DONE: Students explain their testing here.
+        a. A FakeDataSource class is created for double test 
+        b. LiveDataTestUtil and MainCouroutineRule has been added to accomplish the tests
+        c. RemindersListViewModelTest to test the RemindersListViewModel (invalidateShowNoData_showNoData_isTrue - loadReminders_loadsThreeReminders - loadReminders_checkLoading - loadReminders_shouldReturnError)
+        d. SaveReminderViewModelTest to test the SaveReminderViewModel (onClear_clearsReminderLiveData - editReminder_setsLiveDataOfReminderToBeEdited - saveReminder_addsReminderToDataSource - saveReminder_checkLoading - validateData_missingTitle_showSnackbarAndReturnFalse - validateData_missingLocation_showSnackbarAndReturnFalse)
 ```
 
 ## Project Instructions
@@ -76,3 +86,5 @@ Explain what each test does and why
 * [Koin](https://github.com/InsertKoinIO/koin) - A pragmatic lightweight dependency injection framework for Kotlin.
 * [FirebaseUI Authentication](https://github.com/firebase/FirebaseUI-Android/blob/master/auth/README.md) - FirebaseUI provides a drop-in auth solution that handles the UI flows for signing
 * [JobIntentService](https://developer.android.com/reference/androidx/core/app/JobIntentService) - Run background service from the background application, Compatible with >= Android O.
+
+## License
