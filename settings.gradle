@@ -16,4 +16,4 @@ dependencyResolutionManagement {
 }
 
 include ':app'
-rootProject.name='Location Reminder'
+rootProject.name='LocationReminder'
