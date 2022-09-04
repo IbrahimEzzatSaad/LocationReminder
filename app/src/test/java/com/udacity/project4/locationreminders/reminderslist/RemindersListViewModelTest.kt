@@ -24,6 +24,8 @@ import org.hamcrest.core.Is.`is`
 import org.hamcrest.CoreMatchers.nullValue
 import org.junit.After
 
+
+/**In this class we trying to test RemindersListViewModel.**/
 @RunWith(AndroidJUnit4::class)
 @ExperimentalCoroutinesApi
 class RemindersListViewModelTest {
@@ -60,46 +62,64 @@ class RemindersListViewModelTest {
     }
 
 
+
+    /**In this function we try to test deleting all reminders and then we try to load the reminders from our View Model
+     * We here testing two variables which is:
+     * 1-showNoData
+     * 2-reminderList**/
     @Test
     fun invalidateShowNoData_showNoData_isTrue()= runTest{
 
+        //GIVEN - Empty DB
         fakeDataSource.deleteAllReminders()
 
+        //WHEN - Try to load Reminders
         remindersListViewModel.loadReminders()
 
+        //THEN - We expect that our reminder list Live data size is 0 and show no data is true
         assertThat(remindersListViewModel.remindersList.getOrAwaitValue().size, `is` (0))
         assertThat(remindersListViewModel.showNoData.getOrAwaitValue(), `is` (true))
 
     }
 
+
+    /**In this function we test to retrieve the 3 reminders we're inserting**/
     @Test
     fun loadReminders_loadsThreeReminders()= mainCoroutineRule.runBlockingTest {
 
+        //GIVEN - Only 3 Reminders in the DB
         fakeDataSource.deleteAllReminders()
-
         fakeDataSource.saveReminder(reminder1)
         fakeDataSource.saveReminder(reminder2)
         fakeDataSource.saveReminder(reminder3)
 
+
+
+        //WHEN - We try to load Reminders
         remindersListViewModel.loadReminders()
 
+        //THEN - We expect to have only 3 reminders in remindersList and showNoData is false cause we have data
         assertThat(remindersListViewModel.remindersList.getOrAwaitValue().size, `is` (3))
         assertThat(remindersListViewModel.showNoData.getOrAwaitValue(), `is` (false))
 
     }
 
+
+
+    /**Here in this test we testing checkLoading*/
     @Test
     fun loadReminders_checkLoading()= mainCoroutineRule.runBlockingTest{
         // Pause dispatcher so we can verify initial values
         mainCoroutineRule.pauseDispatcher()
 
+        //GIVEN - Only 1 Reminder
         fakeDataSource.deleteAllReminders()
         fakeDataSource.saveReminder(reminder1)
 
-        //when
+        //WHEN - We load Reminders
         remindersListViewModel.loadReminders()
 
-        // Then loading indicator is shown
+        //THEN - loading indicator is shown and after we finishes we get the loading indicator hidden again.
         assertThat(remindersListViewModel.showLoading.getOrAwaitValue(), `is`(true))
 
         // Execute pending coroutines actions
@@ -110,14 +130,19 @@ class RemindersListViewModelTest {
 
     }
 
+
+    /**Here in this test we testing showing an Error*/
+
     @Test
     fun loadReminders_shouldReturnError()= mainCoroutineRule.runBlockingTest{
 
-        //when
+        //GIVEN - Set should return error to "true"
         fakeDataSource.setShouldReturnError(true)
+
+        //WHEN - We load Reminders
         remindersListViewModel.loadReminders()
 
-        //then
+        //THEN - We get showSnackBar in the view model giving us "Reminders not found"
         assertThat(remindersListViewModel.showSnackBar.getOrAwaitValue(), `is`("Reminders not found"))
 
     }

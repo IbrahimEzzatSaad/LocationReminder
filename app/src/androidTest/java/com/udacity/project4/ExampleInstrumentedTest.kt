@@ -10,7 +10,7 @@ import org.junit.Assert.*
 
 /**
  * Instrumented test, which will execute on an Android device.
- *
+ * this class is just an example to check our context
  * See [testing documentation](http://d.android.com/tools/testing).
  */
 @RunWith(AndroidJUnit4::class)

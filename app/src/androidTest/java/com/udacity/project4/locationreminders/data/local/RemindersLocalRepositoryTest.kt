@@ -20,6 +20,15 @@ import org.hamcrest.MatcherAssert
 import org.junit.Assert.assertThat
 
 
+
+/**This test class is meant to test our RemindersLocal Repository.
+ * We have four functions we need to test which is:
+ *      1-getReminders
+ *      2-saveReminder
+ *      3-getReminder by Id
+ *      4-deleteAllReminders
+ *      5-deleteReminder by Id**/
+
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 //Medium Test to test the repository
@@ -60,6 +69,7 @@ class RemindersLocalRepositoryTest {
         database.close()
     }
 
+    /**This function we save a reminder and then we retrieve it by Id**/
     @Test
     fun saveReminder_retrievesReminderById() = runBlocking {
         // GIVEN - A new reminder saved in the database.
@@ -78,60 +88,72 @@ class RemindersLocalRepositoryTest {
         assertThat(result.data.id, `is`(reminder1.id))
     }
 
+    /**This function we save all reminders defined above and then we retrieve all again**/
     @Test
     fun saveReminders_retrievesAllReminders() = runBlocking {
-        // GIVEN - A new reminder saved in the database.
+        // GIVEN - A new reminders saved in the database.
         localRepository.saveReminder(reminder1)
         localRepository.saveReminder(reminder2)
         localRepository.saveReminder(reminder3)
 
-        // WHEN  - reminder retrieved by ID.
+        // WHEN  - We retrieve all reminders
         val result = localRepository.getReminders()
 
-        // THEN - Correct number of reminders returned.
+        // THEN - Correct number of reminders returned which is 3.
         result as Result.Success
         assertThat(result.data.size, `is`(3))
     }
 
+
+    /**In this function we save all reminders and then we delete one by Id**/
     @Test
     fun saveReminders_deletesOneReminderById() = runBlocking {
-
+        // GIVEN - A new reminders saved in the database.
         localRepository.saveReminder(reminder1)
         localRepository.saveReminder(reminder2)
         localRepository.saveReminder(reminder3)
 
+        // WHEN  - Delete one reminder by Id and retrieve all reminders
         localRepository.deleteReminder(reminder1.id)
-
         val result = localRepository.getReminders()
 
+        //THEN - We expect the size to be just 2 reminders left.
         result as Result.Success
         assertThat(result.data.size, `is`(2))
         assertThat(result.data[0].location, `is`(reminder2.location))
     }
 
+
+    /**In this function we save all reminders and then we delete all reminders**/
     @Test
     fun saveReminders_deletesAllReminders() = runBlocking {
-
+        // GIVEN - A new reminders saved in the database.
         localRepository.saveReminder(reminder1)
         localRepository.saveReminder(reminder2)
         localRepository.saveReminder(reminder3)
 
+        // WHEN  - Delete all Reminders and try to retrieve all reminders
         localRepository.deleteAllReminders()
-
         val result = localRepository.getReminders()
 
+        // THEN - We expect we retrieve 0 reminders cause we deleted all previously.
         result as Result.Success
         assertThat(result.data.size, `is`(0))
 
     }
 
+
+    /**In this function we delete all reminders if we have any and try to retrieve reminder by id which does not exist.**/
     @Test
     fun getReminder_returnsError() = runBlocking {
 
+        //GIVEN - Empty DB
         localRepository.deleteAllReminders()
 
+        //WHEN - We try to retrieve reminder by id which does not exist
         val result = localRepository.getReminder(reminder1.id) as Result.Error
 
+        //THEN - We get an Result.Error message
         assertThat(result.message, `is`("Reminder not found!"))
     }
 

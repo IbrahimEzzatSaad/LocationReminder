@@ -41,7 +41,7 @@ import org.hamcrest.core.IsNot.not
 import org.koin.test.KoinTest
 
 
-//Please not that these tests should be run on API 29 or less
+//Please note that these tests should be run on API 29 or less
 @RunWith(AndroidJUnit4::class)
 @LargeTest
 //END TO END test to black box test the app
@@ -57,7 +57,7 @@ class RemindersActivityTest :
     @get:Rule
     val activityRule = ActivityTestRule(RemindersActivity::class.java)
 
-    // get activity context
+    // Get activity context
     private fun getActivity(activityScenario: ActivityScenario<RemindersActivity>): Activity? {
         var activity: Activity? = null
         activityScenario.onActivity {
@@ -119,12 +119,15 @@ class RemindersActivityTest :
     }
 
 
+    /** In this function we test to add a reminder and shows saved toast*/
     @ExperimentalCoroutinesApi
     @Test
     fun showReminderSavedToast() = runBlocking{
+        //GIVEN - Launch Reminder activity
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
+        //WHEN - We start to input some details for the reminder
         onView(withId(R.id.addReminderFAB)).perform(click())
         onView(withId(R.id.reminderTitle)).perform(typeText("TITLE1"), closeSoftKeyboard())
         onView(withId(R.id.reminderDescription)).perform(typeText("DESC1"), closeSoftKeyboard())
@@ -132,11 +135,13 @@ class RemindersActivityTest :
 
         onView(withId(com.google.android.material.R.id.snackbar_action)).perform(click())
 
+        //Performing Long click in the map to pick a location
         onView(withId(R.id.map)).perform(longClick())
         onView(withId(R.id.button_save)).perform(click())
         onView(withId(R.id.saveReminder)).perform(click())
 
 
+        //THEN - We expect to have a Toast displaying reminder_saved String.
         onView(withText(R.string.reminder_saved)).inRoot(withDecorView(not(`is`(getActivity(activityScenario)?.window?.decorView))))
             .check(
                 matches(
@@ -147,14 +152,18 @@ class RemindersActivityTest :
         activityScenario.close()
     }
 
+    /**In this function we test to add a reminder without entering a title*/
     @Test
     fun showSnackbar_enterTitle(){
+        //GIVEN - Launch Reminders Activity
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
+        //WHEN - we click on add reminder and try to save the reminder without giving any inputs
         onView(withId(R.id.addReminderFAB)).perform(click())
         onView(withId(R.id.saveReminder)).perform(click())
 
+        //THEN - We expect we have a SnackBar displaying err_enter_title
         onView(withId(com.google.android.material.R.id.snackbar_text))
             .check(matches(withText(R.string.err_enter_title)))
 
@@ -162,15 +171,19 @@ class RemindersActivityTest :
 
     }
 
+    /**In this function we test to add a reminder without entering a location*/
     @Test
     fun showSnackbar_enterLocation(){
+        //GIVEN - Launch Reminders Activity
         val activityScenario = ActivityScenario.launch(RemindersActivity::class.java)
         dataBindingIdlingResource.monitorActivity(activityScenario)
 
+        //WHEN - we click on add reminder and try to save the reminder without giving a location
         onView(withId(R.id.addReminderFAB)).perform(click())
         onView(withId(R.id.reminderTitle)).perform(replaceText("TITLE1"), closeSoftKeyboard())
         onView(withId(R.id.saveReminder)).perform(click())
 
+        //THEN - We expect we have a SnackBar displaying err_select_location
         onView(withId(com.google.android.material.R.id.snackbar_text))
             .check(matches(withText(R.string.err_select_location)))
 

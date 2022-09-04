@@ -23,12 +23,12 @@ import org.junit.runner.RunWith
 import org.koin.core.context.stopKoin
 
 
-//@Config(sdk = [Build.VERSION_CODES.P]) // set the target sdk to P for test
+
+/**Here we're testing SaveReminderViewModel with fakeDataSource**/
 @ExperimentalCoroutinesApi
 @RunWith(AndroidJUnit4::class)
 class SaveReminderViewModelTest {
 
-    //TODO: provide testing to the SaveReminderView and its live data objects
     private lateinit var saveReminderViewModel: SaveReminderViewModel
     // Use a fake data source to be injected into the viewmodel
     private lateinit var fakeDataSource: FakeDataSource
@@ -53,10 +53,11 @@ class SaveReminderViewModelTest {
         saveReminderViewModel = SaveReminderViewModel(ApplicationProvider.getApplicationContext(), fakeDataSource)
     }
 
+    /**In this function we clear all reminders Live Data and test if they all null*/
     @Test
     fun onClear_clearsReminderLiveData(){
 
-        //given
+        //GIVEN - Data to the variables
         saveReminderViewModel.reminderTitle.value = reminder1.title
         saveReminderViewModel.reminderDescription.value = reminder1.description
         saveReminderViewModel.reminderSelectedLocationStr.value = reminder1.location
@@ -64,10 +65,10 @@ class SaveReminderViewModelTest {
         saveReminderViewModel.longitude.value = reminder1.longitude
         saveReminderViewModel.reminderId.value = reminder1.id
 
-        //when
+        //WHEN - We call on clear
         saveReminderViewModel.onClear()
 
-        //then
+        //THEN - We expect we have them all null
         assertThat(saveReminderViewModel.reminderTitle.getOrAwaitValue(), `is` (nullValue()))
         assertThat(saveReminderViewModel.reminderDescription.getOrAwaitValue(), `is`(nullValue()))
         assertThat(saveReminderViewModel.reminderSelectedLocationStr.getOrAwaitValue(), `is`(nullValue()))
@@ -77,13 +78,15 @@ class SaveReminderViewModelTest {
 
     }
 
+    /**In this function we testing set the Live Data of reminder to be edited*/
     @Test
     fun editReminder_setsLiveDataOfReminderToBeEdited(){
 
-        //when
+        //GIVEN & WHEN - We call Edit reminder and passing reminder1
         saveReminderViewModel.editReminder(reminder1)
 
-        //then
+
+        //THEN - We expect that our saveReminderViewModel is holding the data of reminder1.
         assertThat(saveReminderViewModel.reminderTitle.getOrAwaitValue(), `is` (reminder1.title))
         assertThat(saveReminderViewModel.reminderDescription.getOrAwaitValue(), `is`(reminder1.description))
         assertThat(saveReminderViewModel.reminderSelectedLocationStr.getOrAwaitValue(), `is`(reminder1.location))
@@ -92,14 +95,18 @@ class SaveReminderViewModelTest {
         assertThat(saveReminderViewModel.reminderId.getOrAwaitValue(), `is`(reminder1.id))
     }
 
+
+    /**In this function we testing add Reminder to Data Source via our ViewModel.saveReminder function **/
     @Test
     fun saveReminder_addsReminderToDataSource() = mainCoroutineRule.runBlockingTest{
 
-        //when
+        //GIVEN - We call save reminder passing reminder1
         saveReminderViewModel.saveReminder(reminder1)
+
+        //WHEN - Call get reminder that has id 1
         val checkReminder = fakeDataSource.getReminder("1") as Result.Success
 
-        //then
+        //THEN - We expect to get reminder1
         assertThat(checkReminder.data.title, `is` (reminder1.title))
         assertThat(checkReminder.data.description, `is` (reminder1.description))
         assertThat(checkReminder.data.location, `is` (reminder1.location))
@@ -109,43 +116,50 @@ class SaveReminderViewModelTest {
 
     }
 
+    /**In this function we test check Loading **/
     @Test
     fun saveReminder_checkLoading()= mainCoroutineRule.runBlockingTest{
         // Pause dispatcher so we can verify initial values
         mainCoroutineRule.pauseDispatcher()
 
-        //when
+        //GIVEN - reminder1 to be saved
         saveReminderViewModel.saveReminder(reminder1)
 
-        // Then loading indicator is shown
+        // THEN -  loading indicator is shown
         assertThat(saveReminderViewModel.showLoading.getOrAwaitValue(), `is`(true))
 
         // Execute pending coroutines actions
         mainCoroutineRule.resumeDispatcher()
 
-        // Then loading indicator is hidden
+        // THEN -  loading indicator is hidden
         assertThat(saveReminderViewModel.showLoading.getOrAwaitValue(), `is`(false))
 
     }
 
+    /**In this function we test validateData by passing null title and we expect
+     * showSnackBarInt to indicate to err_enter_title
+     * and validate return false */
     @Test
     fun validateData_missingTitle_showSnackbarAndReturnFalse(){
 
-        //when
+        //GIVEN - Calling validateEnteredData and passing no title
         val validate = saveReminderViewModel.validateEnteredData(reminder2_noTitle)
 
-        //then
+        //THEN - We expect a Snackbar to be shown displaying err_enter_title string and validate return false
         assertThat(saveReminderViewModel.showSnackBarInt.getOrAwaitValue(), `is` (R.string.err_enter_title))
         assertThat(validate, `is` (false))
     }
 
+    /**In this function we test validateData by passing null location and we expect
+     * showSnackBarInt to indicate to err_select_location
+     * and validate return false*/
     @Test
     fun validateData_missingLocation_showSnackbarAndReturnFalse(){
 
-        //when
+        //GIVEN - Calling validateEnteredData and passing no location
         val validate = saveReminderViewModel.validateEnteredData(reminder3_noLocation)
 
-        //then
+        //THEN - We expect a Snackbar to be shown displaying err_select_location string and validate return false
         assertThat(saveReminderViewModel.showSnackBarInt.getOrAwaitValue(), `is` (R.string.err_select_location))
         assertThat(validate, `is` (false))
     }
